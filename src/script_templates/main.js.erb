@@ -4,11 +4,40 @@
 
 /* TODO: Move these constants to the rb file **********************************/
 const ATTEMPTS_TO_LOCATE_VIDEOS = 3
+const OVERLAY_CLASSNAME = '__PA_OVERLAY__'
 /******************************************************************************/
 
 function noop() {}
 
-const info = function() { console.info('PA:', ...arguments) }
+['log', 'info', 'error'].map(f => {
+  console[f] = function() { console[f]('PA-Ext:', ...arguments) }
+})
+
+/**
+ * Finds or creates a new overlay for the video element.
+ * @param   {Object}  video  The video HTML element
+ * @return  {Object}         The overlay HTML element
+ */
+function findOrCreateOverlay(video) {
+  const container = video.parentElement
+  const overlay_search = Array(...container.getElementsByClassName(OVERLAY_CLASSNAME))
+  if (overlay_search.length >= 1) {
+    // Remove any extra overlays and keeping and returning only one
+    overlay_search.slice(1).map(container.removeChild)
+    return overlay_search.item(0)
+  } else {
+    // No overlays found, create one and insert it just before the video
+    const overlay = document.createElement('div')
+    overlay.className = OVERLAY_CLASSNAME
+    overlay.style.position = 'absolute'
+    overlay.style.width = `${video.offsetWidth}px`
+    overlay.style.height = `${video.offsetHeight}px`
+    overlay.style.zIndex = 1000
+    overlay.style.backgroundColor = 'red'
+    container.insertBefore(overlay, video)
+    return overlay
+  }
+}
 
 /**
  * Pauses and shows overlay over video.
@@ -21,23 +50,8 @@ function handleVideo(video) {
   video.currentTime = 0
   video.pause()
 
-  const {
-    offsetWidth:  video_width,
-    offsetHeight: video_height
-  } = video
-
-  const container = video.parentElement
-  const overlay = document.createElement('div')
-  const overlay_style = {
-    position: 'absolute',
-    width: `${video_width}px`,
-    height: `${video_height}px`,
-    'z-index': '1000',
-    'background-color': 'red'
-  }
-  overlay.style = overlay_style
-
-  container.insertBefore(overlay, video)
+  const overlay = findOrCreateOverlay(video)
+  info(overlay)
 }
 
 
