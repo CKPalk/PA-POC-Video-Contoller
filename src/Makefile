@@ -1,4 +1,4 @@
-all: main.js manifest.json
+all: main.js pa-style.css manifest.json
 
 PWD = $(shell pwd)
 BUILD_ROOT = $(PWD)/../build
@@ -13,7 +13,7 @@ ifndef SITE_CFG
 endif
 
 COMMON_CFG = ./config/pa_common.rb
-TEMPLATE_FOLDER = script_templates
+TEMPLATE_FOLDER = templates
 IMG_FOLDER = assets
 
 ERB_COMMAND = erb -r $(COMMON_CFG) -r $(SITE_CFG)
@@ -21,17 +21,14 @@ BUILD_DIR = $(BUILD_ROOT)/$(PRODUCT_DIR)
 
 COMMON_FILES = \
 	manifest.json \
-	main.js
+	main.js \
+	pa-style.css
 
 ICONS = \
-	$(IMG_FOLDER)/icon.png \
-	$(IMG_FOLDER)/icon_32x32.png \
-	$(IMG_FOLDER)/icon_38x38.png \
-	$(IMG_FOLDER)/icon_48x48.png \
-	$(IMG_FOLDER)/icon_128x128.png
+	$(IMG_FOLDER)/*
 
 clean:
-	rm -f main.js manifest.json
+	rm -f $(COMMON_FILES)
 
 check: main.js
 	jscs $^
@@ -40,7 +37,10 @@ check: main.js
 main.js: $(TEMPLATE_FOLDER)/main.js.erb $(SITE_CFG)
 	$(ERB_COMMAND) $< >$@
 
-manifest.json: manifest.json.erb $(SITE_CFG)
+pa-style.css: $(TEMPLATE_FOLDER)/pa-style.css.erb $(SITE_CFG)
+	$(ERB_COMMAND) $< >$@
+
+manifest.json: $(TEMPLATE_FOLDER)/manifest.json.erb $(SITE_CFG)
 	$(ERB_COMMAND) $< >$@
 
 build: clean all
