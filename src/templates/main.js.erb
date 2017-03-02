@@ -1,0 +1,189 @@
+/** main.js.erb
+ *  This script is run at the end of matched documents.
+*/
+
+/* TODO: Move these constants to the rb file **********************************/
+const ATTEMPTS_TO_LOCATE_VIDEOS = 3
+
+const GOOGLE_API_KEY = 'AIzaSyB7lbZlbuGC3fy6p0kjfdk0bIKf6v00Amo'
+/******************************************************************************/
+
+function noop() {}
+
+function ajax_get(url, params, callback) {
+  var xhttp = new XMLHttpRequest()
+  xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200)
+         callback(xhttp.responseText)
+  }
+  xhttp.open('GET', url, true)
+  xhttp.send()
+}
+
+function findBestContainer(video) {
+  const isGoodContainer = ({ offsetWidth, offsetHeight }) => (
+    offsetWidth  === video.offsetWidth &&
+    offsetHeight === video.offsetHeight
+  )
+
+  let container = video.parentElement
+  while (isGoodContainer(container.parentElement))
+    container = container.parentElement
+  return container
+}
+
+function getStyleValue(element, property) {
+  return window.getComputedStyle(element).getPropertyValue(property)
+}
+
+function removeElement(element) {
+  try {
+    element.parentElement.removeChild(element)
+  } catch(e) {
+  }
+}
+
+function addClickEvent(element, fn) {
+  if (!element || !fn) return
+  element.addEventListener('click', fn)
+}
+
+function createOverlay(video) {
+
+  const container = findBestContainer(video)
+
+  const overlay = document.createElement('div')
+  overlay.style.position = 'absolute'
+  overlay.style.top = '0'
+  overlay.style.width = `${video.offsetWidth}px`
+  overlay.style.height = `${video.offsetHeight}px`
+  overlay.style.pointerEvents = 'none'
+  overlay.style.overflow = 'hidden'
+
+  overlay.class = 'pa-overlay'
+  overlay.innerHTML = `
+    <div class='pa-popout' style='pointer-events: all;'>
+      <img class='pa-popout__icon' src='${chrome.extension.getURL("logo.png")}'></img>
+      <a class='pa-popout__button snooze'><img src='${chrome.extension.getURL("button-x.png")}'></img></a>
+      <a class='pa-popout__button like'><img src='${chrome.extension.getURL("button-heart.png")}'></img></a>
+    </div>
+  `
+  container.appendChild(overlay)
+
+  // const skip_button = overlay.getElementsByClassName(CLASSNAMES.overlay.popout.skip.class)[0]
+  //
+  // addClickEvent(skip_button, () =>
+  //   video
+  //     .play()
+  //     .then(() => {
+  //       video.currentTime = video.duration
+  //       removeElement(overlay)
+  //     })
+  // )
+
+  return overlay
+}
+
+/**
+ * Finds or creates a new overlay for the video element.
+ * @param   {Object}  video  The video HTML element
+ * @return  {Object}         The overlay HTML element
+ */
+function findOrCreateOverlay(video) {
+  const overlay = document.getElementById('pa-overlay')
+  return overlay || createOverlay(video)
+}
+
+function ISOStringToSeconds(string) {
+  const hours   = parseInt((string.match(/\d{1,2}(?=H)/) || [])[0]) || 0,
+        minutes = parseInt((string.match(/\d{1,2}(?=M)/) || [])[0]) || 0,
+        seconds = parseInt((string.match(/\d{1,2}(?=S)/) || [])[0]) || 0
+
+  return (hours * 60 * 60) + (minutes * 60) + seconds
+}
+
+/**
+ * Pauses and shows overlay over video.
+ * @param   {Object}  video  A video element on the page.
+ */
+function handleVideo(video) {
+  const pageUrl = window.document.URL
+
+  const pageMatching = {
+    youtube: {
+      site_regex: /.*:\/\/.*\.youtube\.com\/.*/,
+      video_regex: /\?v=(.*?)([^\w_-]|$)/
+    }
+  }
+
+  if (pageUrl.match(pageMatching.youtube.site_regex)) {
+    // ID is capture group 1 of Regex
+    const videoId = (pageUrl.match(pageMatching.youtube.video_regex) || [])[1]
+    if (!videoId) return // No video id means we cannot ensure we are blocking an ad for youtube
+
+    const url = 'https://www.googleapis.com/youtube/v3/videos' +
+                `?id=${videoId}` +
+                '&part=contentDetails' +
+                `&key=${GOOGLE_API_KEY}`
+
+    ajax_get(url, {}, response => {
+      const { items, pageInfo: { totalResults } } = JSON.parse(response)
+      if (totalResults !== 1) return // Supplying video id should return only one result
+      const { id, contentDetails: { duration } } = items[0]
+
+      const videoDuration = ISOStringToSeconds(duration)
+      if (Math.abs(video.duration - videoDuration) > 1) {
+        // When the video lengths are different by more than 1 second we assume the playing
+        // video is an advertisement.
+        const overlay = findOrCreateOverlay(video)
+        video.onloadstart = () => { removeElement(overlay) }
+      }
+    })
+    return
+  } else {
+    video.currentTime = 0
+    video.pause()
+
+    const overlay = findOrCreateOverlay(video)
+  }
+}
+
+function isProjectAwesomePage() {
+  return !!window.document.URL.match(/https?:\/\/(nightly|qa0)?\.projectawesome\.xyz\/.*/)
+}
+
+
+/**
+ * Searches document for video elements, if there none it tries attempts
+ * searching the document again after progressively long timeouts.
+ * Any videos found are then processed.
+*/
+function main(attempts_left) {
+  if (attempts_left === 0) return
+  if (isProjectAwesomePage()) return
+
+  // Find all <video /> elements in the document
+  const videos = Array(...document.getElementsByTagName('video'))
+
+  if (videos.length === 0) {
+    const timeout = parseInt(2 * attempts_left * 1000)
+    setTimeout(main, timeout, attempts_left - 1)
+    return
+  }
+
+  videos.forEach(video => {
+    console.log('Video found:', video)
+    // For each video
+    video.onloadeddata = () => {
+      video.onloadeddata = noop
+      // Once the video has loaded, wait 0.5s before working with it
+      setTimeout(handleVideo, 500, video)
+    }
+  })
+}
+
+
+
+if (typeof main === 'function') {
+  main(ATTEMPTS_TO_LOCATE_VIDEOS)
+}

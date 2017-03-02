@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
 
-  "name": "Project Awesome Video Ad Controller",
-  "description": "This extension will help you to curate your video ad choices",
-  "version": "1.0.0",
+  "name": "<%= @PRODUCT_TITLE %>",
+  "description": "<%= @PRODUCT_DESCRIPTION %>",
+  "version": "<%= @VERSION %>",
 
   "browser_action": {
   "default_icon": {
@@ -37,6 +37,7 @@
     {
       "matches": ["<all_urls>"],
       "js": ["main.js"],
+      "css": ["pa-style.css"],
       "all_frames" : true,
       "run_at" : "document_end",
       "match_about_blank" : true
@@ -44,8 +45,7 @@
   ],
 
   "web_accessible_resources": [
-    "img/*.jpg",
-    "logo.png",
+    "*.png",
     "webfonts/proximanova/*"
   ]
 }

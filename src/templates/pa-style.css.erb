@@ -1,0 +1,34 @@
+
+.pa-popout {
+  position: absolute;
+  top: 30%;
+  padding-right: 50px;
+  min-height: 40px;
+  width: 100px;
+  padding: 10px 50px 10px 10px;
+  left: -110px;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition: left 100ms linear;
+}
+.pa-popout:hover {
+  left: 0;
+}
+
+.pa-popout__icon {
+  position: absolute;
+  right: 5px;
+  height: 40px;
+  width: 40px;
+}
+
+.pa-popout__button {
+  display: inline-block;
+  margin-top: 5px;
+  height: 30px;
+  width: 30px;
+}
+
+.pa-popout__button > * {
+  width: inherit;
+  height: inherit;
+}
