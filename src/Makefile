@@ -1,4 +1,4 @@
-all: main.js pa-style.css manifest.json
+all: main.js pa-style.css manifest.json popup.html popup.css popup.js globals.js
 
 PWD = $(shell pwd)
 BUILD_ROOT = $(PWD)/../build
@@ -20,6 +20,10 @@ ERB_COMMAND = erb -r $(COMMON_CFG) -r $(SITE_CFG)
 BUILD_DIR = $(BUILD_ROOT)/$(PRODUCT_DIR)
 
 COMMON_FILES = \
+	globals.js \
+	popup.html \
+	popup.js \
+	popup.css \
 	manifest.json \
 	main.js \
 	pa-style.css
@@ -34,17 +38,31 @@ check: main.js
 	jscs $^
 	jshint $^
 
+globals.js: $(TEMPLATE_FOLDER)/globals.js.erb $(SITE_CFG)
+	$(ERB_COMMAND) $< > $@
+
+popup.css: $(TEMPLATE_FOLDER)/popup.css.erb $(SITE_CFG)
+	$(ERB_COMMAND) $< > $@
+
+popup.js: $(TEMPLATE_FOLDER)/popup.js.erb $(SITE_CFG)
+	$(ERB_COMMAND) $< > $@
+
+popup.html: $(TEMPLATE_FOLDER)/popup.html.erb $(SITE_CFG)
+	$(ERB_COMMAND) $< > $@
+
 main.js: $(TEMPLATE_FOLDER)/main.js.erb $(SITE_CFG)
-	$(ERB_COMMAND) $< >$@
+	$(ERB_COMMAND) $< > $@
 
 pa-style.css: $(TEMPLATE_FOLDER)/pa-style.css.erb $(SITE_CFG)
-	$(ERB_COMMAND) $< >$@
+	$(ERB_COMMAND) $< > $@
 
 manifest.json: $(TEMPLATE_FOLDER)/manifest.json.erb $(SITE_CFG)
-	$(ERB_COMMAND) $< >$@
+	$(ERB_COMMAND) $< > $@
 
 build: clean all
 	rm -rf $(BUILD_DIR) $(BUILD_DIR).zip
 	mkdir -p $(BUILD_DIR)
 	cp -r $(COMMON_FILES) $(ICONS) $(SPECIFIC_FILES) $(BUILD_DIR)
 	cd $(BUILD_ROOT) && zip -r $(PRODUCT_DIR).zip $(PRODUCT_DIR)
+	cd $(PWD)
+	make clean

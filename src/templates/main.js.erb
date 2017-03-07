@@ -4,21 +4,11 @@
 
 /* TODO: Move these constants to the rb file **********************************/
 const ATTEMPTS_TO_LOCATE_VIDEOS = 3
+const LOCAL_STORAGE_VIDEOS_KEY = '<%= @local_storage_videos_key %>'
+const CALLOUT_DISPLAY_LENGTH = 3000 //ms (3 seconds)
 
 const GOOGLE_API_KEY = 'AIzaSyB7lbZlbuGC3fy6p0kjfdk0bIKf6v00Amo'
 /******************************************************************************/
-
-function noop() {}
-
-function ajax_get(url, params, callback) {
-  var xhttp = new XMLHttpRequest()
-  xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200)
-         callback(xhttp.responseText)
-  }
-  xhttp.open('GET', url, true)
-  xhttp.send()
-}
 
 function findBestContainer(video) {
   const isGoodContainer = ({ offsetWidth, offsetHeight }) => (
@@ -43,55 +33,107 @@ function removeElement(element) {
   }
 }
 
-function addClickEvent(element, fn) {
-  if (!element || !fn) return
-  element.addEventListener('click', fn)
-}
-
-function createOverlay(video) {
+function createFeedbackForm(video, recordID) {
 
   const container = findBestContainer(video)
 
-  const overlay = document.createElement('div')
-  overlay.style.position = 'absolute'
-  overlay.style.top = '0'
-  overlay.style.width = `${video.offsetWidth}px`
-  overlay.style.height = `${video.offsetHeight}px`
-  overlay.style.pointerEvents = 'none'
-  overlay.style.overflow = 'hidden'
+  const feedbackForm = document.createElement('div')
+  feedbackForm.style.position = 'absolute'
+  feedbackForm.style.top = '0'
+  feedbackForm.style.width = `${video.offsetWidth}px`
+  feedbackForm.style.height = `${video.offsetHeight}px`
+  feedbackForm.style.pointerEvents = 'none'
+  feedbackForm.style.overflow = 'hidden'
 
-  overlay.class = 'pa-overlay'
-  overlay.innerHTML = `
+  feedbackForm.className = 'pa-feedbackForm'
+  feedbackForm.innerHTML = `
     <div class='pa-popout' style='pointer-events: all;'>
-      <img class='pa-popout__icon' src='${chrome.extension.getURL("logo.png")}'></img>
-      <a class='pa-popout__button snooze'><img src='${chrome.extension.getURL("button-x.png")}'></img></a>
-      <a class='pa-popout__button like'><img src='${chrome.extension.getURL("button-heart.png")}'></img></a>
+      <img class='pa-popout__logo' src='${chrome.extension.getURL("logo.png")}'></img>
+      <input id='pa-popout-like' class='pa-popout__button' type='button' value='Like'>
+      <input id='pa-popout-snooze' class='pa-popout__button' type='button' value='Snooze'>
     </div>
   `
-  container.appendChild(overlay)
 
-  // const skip_button = overlay.getElementsByClassName(CLASSNAMES.overlay.popout.skip.class)[0]
-  //
-  // addClickEvent(skip_button, () =>
-  //   video
-  //     .play()
-  //     .then(() => {
-  //       video.currentTime = video.duration
-  //       removeElement(overlay)
-  //     })
-  // )
+  container.appendChild(feedbackForm)
 
-  return overlay
+  setTimeout(() => {
+    upsertAdvertismentRecord(recordID, {
+      screenshot: getVideoScreenshot(video)
+    })
+  }, 1000)
+
+  // Add events to buttons on feedbackForm
+  const like_button = document.getElementById('pa-popout-like')
+  addClickEvent(like_button, () => {
+    upsertAdvertismentRecord(recordID, {
+      screenshot: getVideoScreenshot(video),
+      sentiment: VIDEO_SENTIMENT.LIKE
+    })
+    // recordAdvertisementSentiment(video, VIDEO_SENTIMENT.LIKE)
+    removeElement(feedbackForm)
+  })
+
+  const snooze_button = document.getElementById('pa-popout-snooze')
+  addClickEvent(snooze_button, () => {
+    upsertAdvertismentRecord(recordID, {
+      screenshot: getVideoScreenshot(video),
+      sentiment: VIDEO_SENTIMENT.SNOOZE
+    })
+    // recordAdvertisementSentiment(video, VIDEO_SENTIMENT.SNOOZE)
+    removeElement(feedbackForm)
+  })
+
+  return feedbackForm
+}
+
+function upsertAdvertismentRecord(id, update={}) {
+  return getStorageRecord(LOCAL_STORAGE_VIDEOS_KEY)
+    .then(videos => {
+      const videoIndex = videos.findIndex(v => v.id === id)
+      if (videoIndex === -1) {
+        // Video not found, create new record and append at end
+        videos.push(Object.assign({}, { id, created: new Date() }, update))
+      } else {
+        // Otherwise we extend the object with our update
+        Object.assign(videos[videoIndex], update)
+      }
+
+      // Save our changes
+      saveStorageRecord(LOCAL_STORAGE_VIDEOS_KEY, videos)
+    })
+}
+
+function displayCallout(video) {
+  const container = findBestContainer(video)
+
+  const callout = document.createElement('div')
+  callout.className = 'pa-callout'
+  callout.innerHTML = `
+    <img class='pa-callout__logo' src='${chrome.extension.getURL("logo.png")}'></img>
+    <span>Let us know how you feel about this ad!</span>
+  `
+
+  // TODO: Fade in
+  container.appendChild(callout)
+  setTimeout(removeElement, CALLOUT_DISPLAY_LENGTH, callout)
+  // TODO: Fade out
 }
 
 /**
- * Finds or creates a new overlay for the video element.
+ * Display a feedbackForm over the video letting the user know
+ * that an advertisement was blocked.
+ *
+ * TODO: Clicking feedbackForm should show the user the menu, listing blocked ads
+ *
  * @param   {Object}  video  The video HTML element
- * @return  {Object}         The overlay HTML element
+ * @return  {Object}         The feedbackForm HTML element
  */
-function findOrCreateOverlay(video) {
-  const overlay = document.getElementById('pa-overlay')
-  return overlay || createOverlay(video)
+function displayFeedbackForm(video, recordID) {
+  const feedbackForm = createFeedbackForm(video, recordID)
+  const _onloadstart = video.onloadstart
+  video.onloadstart = () => { removeElement(feedbackForm); _onloadstart() }
+  displayCallout(video)
+  return feedbackForm
 }
 
 function ISOStringToSeconds(string) {
@@ -103,20 +145,83 @@ function ISOStringToSeconds(string) {
 }
 
 /**
- * Pauses and shows overlay over video.
+ * Get a screenshot in base64 format of the video.
+ * @param   {Element}  video  Ad HTML5 video element
+ * @return  {String}          Base64 data
+ */
+function getVideoScreenshot(video) {
+  const canvas = document.createElement('canvas'),
+        context = canvas.getContext('2d'),
+        width  = video.scrollWidth  || video.clientWidth  || 480
+        height = video.scrollHeight || video.clientHeight || 360
+
+  canvas.width  = width
+  canvas.height = height
+  context.drawImage(video, 0, 0, width, height)
+
+  return canvas.toDataURL()
+}
+
+/**
+ * Get information about the video for a package to save in local storage.
+ * This information will be used by the popup and context menu.
+ * @param   {Object}  video  Advertisment video element
+ * @return  {Promise}        Promise to supply video information
+ */
+function getVideoData(video={}) {
+
+  const {
+    duration, src, currentSrc,
+    scrollWidth, clientWidth,
+    scrollHeight, clientHeight
+  } = video
+
+  return {
+    duration: Number(duration) || null,                     // Integer?
+    source: String(src || currentSrc) || null,              // String?
+    dimensions: {
+      width:  Number(scrollWidth  || clientWidth)  || null, // Integer?
+      height: Number(scrollHeight || clientHeight) || null, // Integer?
+    },
+    sentiment: VIDEO_SENTIMENT.NONE
+  }
+}
+
+function removeKnownYoutubeAds() {
+  const byCN = cn => Array(...document.getElementsByClassName(cn))
+  const byID = id => Array(...document.getElementById(id))
+
+  const classes_to_remove = [
+    'video-ads'
+  ]
+  const ids_to_remove = []
+
+  classes_to_remove.forEach(cls => { byCN(cls).map(removeElement) })
+  ids_to_remove.forEach(id => { removeElement(byID(id)) })
+}
+
+/**
+ * Pauses and shows feedbackForm over video.
  * @param   {Object}  video  A video element on the page.
  */
 function handleVideo(video) {
+  video.onloadstart = () => { handleVideo(video) }
+
   const pageUrl = window.document.URL
 
   const pageMatching = {
     youtube: {
       site_regex: /.*:\/\/.*\.youtube\.com\/.*/,
-      video_regex: /\?v=(.*?)([^\w_-]|$)/
+      video_regex: /\?v=(.*?)(&|$)/
     }
   }
 
   if (pageUrl.match(pageMatching.youtube.site_regex)) {
+
+    /* TODO: This throws an error for manipulating the canvas used to generate ad thumbnail
+    removeKnownYoutubeAds()
+    */
+
     // ID is capture group 1 of Regex
     const videoId = (pageUrl.match(pageMatching.youtube.video_regex) || [])[1]
     if (!videoId) return // No video id means we cannot ensure we are blocking an ad for youtube
@@ -127,29 +232,36 @@ function handleVideo(video) {
                 `&key=${GOOGLE_API_KEY}`
 
     ajax_get(url, {}, response => {
-      const { items, pageInfo: { totalResults } } = JSON.parse(response)
+      const { items: [ video_details ], pageInfo: { totalResults } } = JSON.parse(response)
       if (totalResults !== 1) return // Supplying video id should return only one result
-      const { id, contentDetails: { duration } } = items[0]
-
+      const { id, contentDetails: { duration } } = video_details
       const videoDuration = ISOStringToSeconds(duration)
-      if (Math.abs(video.duration - videoDuration) > 1) {
-        // When the video lengths are different by more than 1 second we assume the playing
-        // video is an advertisement.
-        const overlay = findOrCreateOverlay(video)
-        video.onloadstart = () => { removeElement(overlay) }
+
+      const handleAdOrNot = (v) => {
+        // If video durations differ, assume video playing is ad.
+        const isAd = Math.abs(v.duration - videoDuration) > 3
+        if (isAd) {
+          const recordID = generateGUID()
+          upsertAdvertismentRecord(recordID, getVideoData(v))
+          displayFeedbackForm(v, recordID)
+        }
+      }
+
+      if (!video.duration) {
+        video.ondurationchange = () => {
+          if (!video.duration) return
+          else video.ondurationchange = noop
+          handleAdOrNot(video)
+        }
+      } else {
+        handleAdOrNot(video)
       }
     })
-    return
-  } else {
-    video.currentTime = 0
-    video.pause()
-
-    const overlay = findOrCreateOverlay(video)
   }
 }
 
 function isProjectAwesomePage() {
-  return !!window.document.URL.match(/https?:\/\/(nightly|qa0)?\.projectawesome\.xyz\/.*/)
+  return !!window.document.URL.match(/https?:\/\/(nightly\.|qa0\.)?projectawesome\.xyz\/.*/)
 }
 
 
@@ -172,12 +284,15 @@ function main(attempts_left) {
   }
 
   videos.forEach(video => {
-    console.log('Video found:', video)
-    // For each video
-    video.onloadeddata = () => {
-      video.onloadeddata = noop
-      // Once the video has loaded, wait 0.5s before working with it
-      setTimeout(handleVideo, 500, video)
+    // If the video is loaded we run handleVideo, otherwise we wait on video
+    // callback event for when it's loaded.
+    if (video.readyState === 4) {
+      handleVideo(video)
+    } else {
+      video.onloadeddata = () => {
+        video.onloadeddata = noop
+        handleVideo(video)
+      }
     }
   })
 }

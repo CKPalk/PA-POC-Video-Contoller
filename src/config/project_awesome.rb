@@ -6,6 +6,11 @@
 @awesome_cookie_url = "http://prefs.projectawesome.xyz"
 @awesome_cookie_domain = "prefs.projectawesome.xyz"
 
-@post_inst_page_url = @base_url + "/plugin"
 
-@gaTrackingId = "UA-79735862-4"
+@local_storage_videos_key = 'pa-user-videos'
+
+@max_plugin_window_width = 1000
+
+@VIDEO_SENTIMENT_NONE = '__video__sentiment__none__'
+@VIDEO_SENTIMENT_LIKE = '__video__sentiment__like__'
+@VIDEO_SENTIMENT_SNOOZE = '__video__sentiment__snooze__'

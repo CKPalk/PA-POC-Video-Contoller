@@ -1,4 +1,6 @@
 
+
+/* POPOUT */
 .pa-popout {
   position: absolute;
   top: 30%;
@@ -14,7 +16,7 @@
   left: 0;
 }
 
-.pa-popout__icon {
+.pa-popout__logo {
   position: absolute;
   right: 5px;
   height: 40px;
@@ -24,11 +26,33 @@
 .pa-popout__button {
   display: inline-block;
   margin-top: 5px;
-  height: 30px;
-  width: 30px;
 }
 
 .pa-popout__button > * {
   width: inherit;
   height: inherit;
+}
+
+
+
+/* CALLOUT */
+.pa-callout {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.pa-callout > * {
+  padding: 5px;
+}
+
+.pa-callout__logo {
+  height: 80%;
 }
