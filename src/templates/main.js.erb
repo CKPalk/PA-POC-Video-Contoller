@@ -33,6 +33,12 @@ function removeElement(element) {
   }
 }
 
+function addVideoEndAction(video, action) {
+  if (!video || !action) return
+  const _onloadstart = video.onloadstart
+  video.onloadstart = () => { action(); _onloadstart() }
+}
+
 function endVideo(video) {
   video.currentTime = video.duration
 }
@@ -127,6 +133,11 @@ function displayCalloutForForm(video) {
   const callout_display_length = Math.max(videoDurationInMS * 0.5, 1000)
   const defaultRemoveTimeout = setTimeout(removeElement, callout_display_length, callout)
 
+  addVideoEndAction(video, () => {
+    clearTimeout(defaultRemoveTimeout);
+    removeElement(callout)
+  })
+
   addClickEvent(callout, () => {
     clearTimeout(defaultRemoveTimeout)
     const feedbackForm = document.getElementById('pa-popout')
@@ -150,8 +161,7 @@ function displayCalloutForForm(video) {
  */
 function displayFeedbackForm(video, recordID) {
   const feedbackForm = createFeedbackForm(video, recordID)
-  const _onloadstart = video.onloadstart
-  video.onloadstart = () => { removeElement(feedbackForm); _onloadstart() }
+  addVideoEndAction(video, () => { removeElement(feedbackForm) })
   displayCalloutForForm(video)
   return feedbackForm
 }
