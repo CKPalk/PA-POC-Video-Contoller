@@ -47,10 +47,10 @@ function createFeedbackForm(video, recordID) {
 
   feedbackForm.className = 'pa-feedbackForm'
   feedbackForm.innerHTML = `
-    <div class='pa-popout' style='pointer-events: all;'>
+    <div class='pa-popout'>
       <img class='pa-popout__logo' src='${chrome.extension.getURL("logo.png")}'></img>
-      <input id='pa-popout-like' class='pa-popout__button' type='button' value='Like'>
-      <input id='pa-popout-snooze' class='pa-popout__button' type='button' value='Snooze'>
+      <a id='pa-popout-like' class='pa-popout__button'>Like</a>
+      <a id='pa-popout-snooze' class='pa-popout__button'>Snooze</a>
     </div>
   `
 
@@ -183,7 +183,7 @@ function getVideoData(video={}) {
       width:  Number(scrollWidth  || clientWidth)  || null, // Integer?
       height: Number(scrollHeight || clientHeight) || null, // Integer?
     },
-    sentiment: VIDEO_SENTIMENT.NONE
+    sentiment: VIDEO_SENTIMENT.NONE                         // String
   }
 }
 

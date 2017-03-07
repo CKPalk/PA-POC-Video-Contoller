@@ -11,6 +11,10 @@
   left: -110px;
   background-color: rgba(0, 0, 0, 0.4);
   transition: left 100ms linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
 }
 .pa-popout:hover {
   left: 0;
@@ -25,12 +29,10 @@
 
 .pa-popout__button {
   display: inline-block;
-  margin-top: 5px;
-}
-
-.pa-popout__button > * {
-  width: inherit;
-  height: inherit;
+  flex-grow: 1;
+  text-align: center;
+  height: 30px;
+  line-height: 30px;
 }
 
 
