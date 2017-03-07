@@ -16,7 +16,7 @@
   justify-content: center;
   pointer-events: all;
 }
-.pa-popout:hover {
+.pa-popout:hover, .pa-popout.open {
   left: 0;
 }
 
@@ -33,16 +33,31 @@
   text-align: center;
   height: 30px;
   line-height: 30px;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  margin: 3px;
 }
 
+.button-accept { background-color: #1ECA6B; }
+.button-reject { background-color: #F84339; }
+.button-accept:hover {
+  text-decoration: none;
+  background-color: #009338;
+}
+.button-reject:hover {
+  text-decoration: none;
+  background-color: #DF2A20;
+}
 
 
 /* CALLOUT */
 .pa-callout {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  pointer-events: none;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -55,6 +70,18 @@
   padding: 5px;
 }
 
+.pa-callout:last-child {
+  padding-right: 15px;
+}
+
 .pa-callout__logo {
   height: 80%;
+}
+
+.fader {
+  transition: opacity <%= @fade_out_delay_ms %>ms linear;
+}
+
+.fader.fadeOut {
+  opacity: 0;
 }

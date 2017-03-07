@@ -33,6 +33,10 @@ function removeElement(element) {
   }
 }
 
+function endVideo(video) {
+  video.currentTime = video.duration
+}
+
 function createFeedbackForm(video, recordID) {
 
   const container = findBestContainer(video)
@@ -47,48 +51,51 @@ function createFeedbackForm(video, recordID) {
 
   feedbackForm.className = 'pa-feedbackForm'
   feedbackForm.innerHTML = `
-    <div class='pa-popout'>
+    <div id='pa-popout' class='pa-popout'>
       <img class='pa-popout__logo' src='${chrome.extension.getURL("logo.png")}'></img>
-      <a id='pa-popout-like' class='pa-popout__button'>Like</a>
-      <a id='pa-popout-snooze' class='pa-popout__button'>Snooze</a>
+      <a id='pa-popout-snooze' class='pa-popout__button button-reject'>Snooze</a>
+      <a id='pa-popout-like' class='pa-popout__button button-accept'>Like</a>
     </div>
   `
 
   container.appendChild(feedbackForm)
 
-  setTimeout(() => {
-    upsertAdvertismentRecord(recordID, {
+  const upsertScreenshotAndSentiment = sentiment => {
+    const update = {
       screenshot: getVideoScreenshot(video)
-    })
+    }
+    if (sentiment) {
+      Object.assign(update, {sentiment})
+    }
+    upsertAdvertismentRecord(recordID, update)
+  }
+
+  const defaultScreenshot = setTimeout(() => {
+    upsertScreenshotAndSentiment()
   }, 1000)
 
   // Add events to buttons on feedbackForm
   const like_button = document.getElementById('pa-popout-like')
   addClickEvent(like_button, () => {
-    upsertAdvertismentRecord(recordID, {
-      screenshot: getVideoScreenshot(video),
-      sentiment: VIDEO_SENTIMENT.LIKE
-    })
-    // recordAdvertisementSentiment(video, VIDEO_SENTIMENT.LIKE)
+    clearTimeout(defaultScreenshot)
+    upsertScreenshotAndSentiment(VIDEO_SENTIMENT.LIKE)
     removeElement(feedbackForm)
   })
 
   const snooze_button = document.getElementById('pa-popout-snooze')
   addClickEvent(snooze_button, () => {
-    upsertAdvertismentRecord(recordID, {
-      screenshot: getVideoScreenshot(video),
-      sentiment: VIDEO_SENTIMENT.SNOOZE
-    })
-    // recordAdvertisementSentiment(video, VIDEO_SENTIMENT.SNOOZE)
+    clearTimeout(defaultScreenshot)
+    upsertScreenshotAndSentiment(VIDEO_SENTIMENT.SNOOZE)
+    endVideo(video)
     removeElement(feedbackForm)
   })
 
-  return feedbackForm
+  return feedbackForm //document.getElementById('pa-popout')
 }
 
 function upsertAdvertismentRecord(id, update={}) {
   return getStorageRecord(LOCAL_STORAGE_VIDEOS_KEY)
-    .then(videos => {
+    .then((videos=[]) => {
       const videoIndex = videos.findIndex(v => v.id === id)
       if (videoIndex === -1) {
         // Video not found, create new record and append at end
@@ -103,7 +110,7 @@ function upsertAdvertismentRecord(id, update={}) {
     })
 }
 
-function displayCallout(video) {
+function displayCalloutForForm(video) {
   const container = findBestContainer(video)
 
   const callout = document.createElement('div')
@@ -115,8 +122,21 @@ function displayCallout(video) {
 
   // TODO: Fade in
   container.appendChild(callout)
-  setTimeout(removeElement, CALLOUT_DISPLAY_LENGTH, callout)
-  // TODO: Fade out
+  const videoDurationInMS = (video.duration || 0) * 1000
+  // Show callout for 50% of ad duration, minimum 1s
+  const callout_display_length = Math.max(videoDurationInMS * 0.5, 1000)
+  const defaultRemoveTimeout = setTimeout(removeElement, callout_display_length, callout)
+
+  addClickEvent(callout, () => {
+    clearTimeout(defaultRemoveTimeout)
+    const feedbackForm = document.getElementById('pa-popout')
+    if (feedbackForm) {
+      feedbackForm.className = `${feedbackForm.className} open`
+    }
+    callout.className = `${callout.className} fader fadeOut`
+    setTimeout(removeElement, <%= @fade_out_delay_ms %>, callout)
+  })
+
 }
 
 /**
@@ -132,7 +152,7 @@ function displayFeedbackForm(video, recordID) {
   const feedbackForm = createFeedbackForm(video, recordID)
   const _onloadstart = video.onloadstart
   video.onloadstart = () => { removeElement(feedbackForm); _onloadstart() }
-  displayCallout(video)
+  displayCalloutForForm(video)
   return feedbackForm
 }
 
@@ -187,17 +207,26 @@ function getVideoData(video={}) {
   }
 }
 
+/**
+ * Removes ads from youtube.
+ */
 function removeKnownYoutubeAds() {
   const byCN = cn => Array(...document.getElementsByClassName(cn))
   const byID = id => Array(...document.getElementById(id))
 
   const classes_to_remove = [
-    'video-ads'
+    'video-ads',
+    'iv-promo'
   ]
   const ids_to_remove = []
 
-  classes_to_remove.forEach(cls => { byCN(cls).map(removeElement) })
-  ids_to_remove.forEach(id => { removeElement(byID(id)) })
+  const remove = e => {
+    // e.style.opacity = 0
+    removeElement(e)
+  }
+
+  classes_to_remove.forEach(cls => { byCN(cls).map(remove) })
+  ids_to_remove.forEach(id => { remove(byID(id)) })
 }
 
 /**
@@ -218,9 +247,9 @@ function handleVideo(video) {
 
   if (pageUrl.match(pageMatching.youtube.site_regex)) {
 
-    /* TODO: This throws an error for manipulating the canvas used to generate ad thumbnail
+    // TODO: This throws an error for manipulating the canvas used to generate ad thumbnail
     removeKnownYoutubeAds()
-    */
+
 
     // ID is capture group 1 of Regex
     const videoId = (pageUrl.match(pageMatching.youtube.video_regex) || [])[1]
@@ -284,6 +313,7 @@ function main(attempts_left) {
   }
 
   videos.forEach(video => {
+    video.crossOrigin = 'anonymous'
     // If the video is loaded we run handleVideo, otherwise we wait on video
     // callback event for when it's loaded.
     if (video.readyState === 4) {

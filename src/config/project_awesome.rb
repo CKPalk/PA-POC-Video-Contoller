@@ -14,3 +14,5 @@
 @VIDEO_SENTIMENT_NONE = '__video__sentiment__none__'
 @VIDEO_SENTIMENT_LIKE = '__video__sentiment__like__'
 @VIDEO_SENTIMENT_SNOOZE = '__video__sentiment__snooze__'
+
+@fade_out_delay_ms = 400
