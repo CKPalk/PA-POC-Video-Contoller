@@ -1,0 +1,31 @@
+
+.adNotification {
+  pointer-events: all;
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.adNotification > * {
+  padding: 5px;
+}
+
+.adNotification:last-child {
+  padding-right: 15px;
+}
+
+.adNotification__logo {
+  width: 40px;
+  height: 50%;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
