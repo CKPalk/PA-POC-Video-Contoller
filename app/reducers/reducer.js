@@ -1,15 +1,16 @@
 import * as ActionTypes from '../constants/ActionTypes'
 
-const initialState = [{
-  text: 'Use Redux',
-  completed: false,
-  id: 0
-}]
+const initialState = []
 
 const actionsMap = {
   // [ActionTypes.ACTION_NAME]: (state, action) => updated state,
   // or
   // [ActionTypes.ACTION_NAME](state, action) { return updated state }
+  [ActionTypes.AD.SET_THUMBNAIL](state, action) {
+    return [{
+      imageData: action.imageData
+    }, ...state]
+  },
 
   [ActionTypes.ADD_TODO](state, action) {
     return [{
@@ -49,7 +50,9 @@ const actionsMap = {
 }
 
 export default (state = initialState, action) => {
+  console.log(action)
   const reduceFn = actionsMap[action.type]
+  console.log(reduceFn)
   if (!reduceFn) return state
   return reduceFn(state, action)
 }

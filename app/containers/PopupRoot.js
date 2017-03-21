@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { Provider } from 'react-redux'
 import App from './PopupApp/App'
 
+import '../global.styl'
+
 export default class PopupRoot extends Component {
 
   static propTypes = {

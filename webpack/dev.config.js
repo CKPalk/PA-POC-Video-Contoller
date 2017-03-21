@@ -61,6 +61,12 @@ const baseDevConfig = () => ({
         'css?modules&sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
         'postcss'
       ]
+    }, {
+      test: /\.styl$/,
+      loader: 'style-loader!css-loader!stylus-loader'
+    }, {
+      test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
+      loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
     }]
   }
 });

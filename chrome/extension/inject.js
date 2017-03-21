@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Overlay from '../../app/containers/Overlay'
+import VideoRoot from '../../app/containers/VideoRoot'
 
 import { getState, onStateChange } from '../../app/utils/localStorage'
 
@@ -47,7 +47,7 @@ function renderOverlayForVideo(video) {
     getState()
       .then(state => {
         ReactDOM.render(
-          <Overlay
+          <VideoRoot
             appState={state}
             video={video}
           />,

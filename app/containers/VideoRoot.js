@@ -1,21 +1,21 @@
-import React, { Component, PropTypes } from 'react'
-import { Provider } from 'react-redux'
-import Overlay from './Overlay'
+import React, { PropTypes } from 'react'
+import Overlay from '../components/overlay/Overlay'
 
-export default class VideoRoot extends Component {
+import '../global.styl'
+
+export default class VideoRoot extends React.Component {
 
   static propTypes = {
-    store: PropTypes.object.isRequired,
+    appState: PropTypes.object.isRequired,
     video: PropTypes.object.isRequired
   }
 
   render() {
-    const { store, video } = this.props
-
+    const { appState, video } = this.props
     return (
-      <Provider store={store}>
-        <Overlay video={video} />
-      </Provider>
+      <div className='videoRoot'>
+        <Overlay appState={appState} video={video} />
+      </div>
     )
   }
 }

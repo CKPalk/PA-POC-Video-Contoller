@@ -2,6 +2,10 @@
  * injectedDispatch.js
  */
 
+/**
+ * Identifier of our custom action types as messages are sent to runtime.
+ * @type  {String}
+ */
 export const DISPATCH_MESSAGE_TYPE = 'DISPATCHED_ACTION'
 
 /**

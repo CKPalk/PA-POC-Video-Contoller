@@ -1,13 +1,5 @@
 import { saveState } from './localStorage'
-
-// todos unmarked count
-export function setBadge(state) {
-  const { todos } = state
-  if (chrome.browserAction) {
-    const count = todos.filter(todo => !todo.marked).length
-    chrome.browserAction.setBadgeText({ text: count > 0 ? count.toString() : '' })
-  }
-}
+import setBadge from './setBadge'
 
 export default function () {
   return next => (reducer, initialState) => {

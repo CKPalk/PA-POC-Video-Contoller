@@ -3,31 +3,31 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Header from '../../components/Header'
 import MainSection from '../../components/MainSection'
-import * as TodoActions from '../../actions/todos'
+import * as AdActionCreators from '../../actions/AdActionCreators'
 import style from './App.css'
 
 @connect(
   state => ({
-    todos: state.todos
+    ads: state.ads
   }),
   dispatch => ({
-    actions: bindActionCreators(TodoActions, dispatch)
+    actions: bindActionCreators(AdActionCreators, dispatch)
   })
 )
 export default class App extends Component {
 
   static propTypes = {
-    todos: PropTypes.array.isRequired,
+    ads: PropTypes.array.isRequired,
     actions: PropTypes.object.isRequired
   }
 
   render() {
-    const { todos, actions } = this.props
+    const { ads, actions } = this.props
 
     return (
       <div className={style.normal}>
         <Header addTodo={actions.addTodo} />
-        <MainSection todos={todos} actions={actions} />
+        <MainSection ads={ads} actions={actions} />
       </div>
     )
   }
