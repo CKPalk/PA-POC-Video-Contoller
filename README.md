@@ -1,4 +1,4 @@
-# React Chrome Extension Boilerplate
+# React Chrome Video Ad Control Extension
 
 ## Installation
 
@@ -38,19 +38,3 @@ $ npm run build
 $ npm run build
 $ npm run compress -- [options]
 ```
-
-## How it Works
-
-#### State Management
-
-App state is saved to `chrome.storage.local`.
-
-#### Window
-
-The context menu is created by [chrome/extension/background/contextMenus.js](chrome/extension/background/contextMenus.js).
-
-#### Inject page
-
-The inject script is being run by [chrome/extension/background/inject.js](chrome/extension/background/inject.js).
-
-If you are receiving the error message `Failed to load resource: net::ERR_INSECURE_RESPONSE`, you need to allow invalid certificates for resources loaded from localhost. You can do this by visiting the following URL: `chrome://flags/#allow-insecure-localhost` and enabling **Allow invalid certificates for resources loaded from localhost**.
