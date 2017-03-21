@@ -9,12 +9,13 @@ $ npm install
 
 ## Development
 
-* Run script
+1. Start dev server
 ```bash
 # build files to './dev'
 # start webpack development server
 $ npm run dev
 ```
+2. Load `/dev` as Unpacked Extension in Chrome
 
 #### React/Redux hot reload
 
