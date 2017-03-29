@@ -24,7 +24,6 @@ const onStateChange = fn =>
 
 
 export function reduceStateWithAction(action) {
-  console.log('Got action', action, 'in reduer')
   return getState()
     .then(state => rootReducer(state, action))
     .then(saveState)

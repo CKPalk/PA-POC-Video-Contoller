@@ -1,0 +1,128 @@
+@import '../../global.styl'
+
+$animation-time = .5s
+
+$boxShadowWithColor($shadow-color) {
+  box-shadow: 0 0 5px 0 $shadow-color
+}
+
+
+.animatedButton
+  -webkit-appearance: none
+  display: block
+  cursor: pointer
+  position: relative
+  background-color: $color-aqua
+  color: $color-mist
+  text-transform: uppercase
+  padding: 0
+  min-width: 35px
+  min-height: 20px
+  margin: 12px auto
+  border: none
+  border-radius: 3px
+  transition: all $animation-time ease
+  flex-grow: 1
+  $boxShadowWithColor $color-aqua-light
+  &:hover
+    background-color: darken($color-aqua, 5%)
+  &:active, &:focus
+   outline: 0
+  .content
+    overflow: hidden
+  svg
+    filter: drop-shadow($color-dark-grey 1px 1px 1px)
+    width: 0
+  div
+    display: flex
+    flex-wrap: nowrap
+    justify-content: center
+    align-items: center
+    height: 100%
+    transition: transform $animation-time ease
+    span, svg
+      transition: all $animation-time ease
+    span
+      white-space: nowrap
+      text-shadow: 1px 1px $color-dark-grey
+
+  &.success, &.valid
+    background-color: $color-green
+    color: $color-white
+    $boxShadowWithColor lighten($color-green, 5%)
+    &:hover
+      background-color: darken($color-green, 5%)
+      border-color: darken($color-green, 5%)
+
+  &.invalid
+    background-color: $color-red
+    color: $color-white
+    $boxShadowWithColor lighten($color-red, 5%)
+    &:hover
+      background-color: darken($color-red, 5%)
+      border-color: darken($color-red, 5%)
+
+  &.valid, &.invalid
+    svg path
+      stroke: $color-white
+  i
+    margin-right: 5px
+
+  &.hidden
+    min-width: 0
+    width: 0
+    flex-grow: 0.000001
+    padding: 0
+    margin: 0
+
+  svg
+    margin-right: 5px
+    // Accept button animation
+    .check
+      stroke-dasharray: 36
+      stroke-dashoffset: 36
+      // animation: stroke .3s cubic-bezier(.65, 0, .45, 1) 0.5s forwards
+      animation: stroke .3s cubic-bezier(.65, 0, .45, 1) .3s forwards
+
+    // Reject button animation
+    .cross-1
+      stroke-dasharray: 36
+      stroke-dashoffset: -36
+      // animation: stroke .3s cubic-bezier(.65, 0, .45, 1) 0.2s forwards
+      animation: stroke .3s cubic-bezier(.65, 0, .45, 1) 0.3s forwards
+    .cross-2
+      stroke-dasharray: 36
+      stroke-dashoffset: -36
+      // animation: stroke .4s cubic-bezier(.65, 0, .45, 1) 0.2s forwards
+      animation: stroke .3s cubic-bezier(.65, 0, .45, 1) 0.5s forwards
+
+    // Caution triangle button animation
+    .triangle
+      stroke-dasharray: 98
+      stroke-dashoffset: 98
+      -webkit-animation: stroke .4s cubic-bezier(.65, 0, .45, 1) 1s forwards
+      animation: stroke .4s cubic-bezier(.65, 0, .45, 1) 1s forwards
+    .exclaim-1
+      stroke: #666666
+      stroke-dasharray:38
+      stroke-dashoffset: -36
+      animation: stroke .4s cubic-bezier(.65, 0, .45, 1) 0.5s forwards
+    .exclaim-2
+      stroke: #666666
+      stroke-dasharray:12
+      stroke-dashoffset: -12
+      animation: stroke .4s cubic-bezier(.65, 0, .45, 1) 0.5s forwards
+
+
+/* Animations */
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0
+  }
+}
+
+@keyframes slideWidth {
+  100% {
+    width: 35px
+  }
+}

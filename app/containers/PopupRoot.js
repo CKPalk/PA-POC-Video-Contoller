@@ -1,22 +1,15 @@
-import React, { Component, PropTypes } from 'react'
+import React, { PropTypes } from 'react'
 import { Provider } from 'react-redux'
-import App from './PopupApp/App'
-
+import App from './app/App'
 import '../global.styl'
 
-export default class PopupRoot extends Component {
+const PopupRoot = ({ store }) =>
+  <Provider store={store}>
+    <App />
+  </Provider>
 
-  static propTypes = {
-    store: PropTypes.object.isRequired
-  }
-
-  render() {
-    const { store } = this.props
-
-    return (
-      <Provider store={store}>
-        <App />
-      </Provider>
-    )
-  }
+PopupRoot.propTypes = {
+  store: PropTypes.object.isRequired
 }
+
+export default PopupRoot

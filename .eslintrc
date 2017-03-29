@@ -22,7 +22,8 @@
     "no-use-before-define": ["error", { "functions": false }],
     "arrow-parens": ["error", "as-needed"],
     "no-param-reassign": ["error", { "props": false }],
-    "jsx-quotes": ["error", "prefer-single"]
+    "jsx-quotes": ["error", "prefer-single"],
+    "new-cap": 0
   },
   "plugins": [
     "react"

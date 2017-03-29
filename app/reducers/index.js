@@ -1,6 +1,10 @@
 import { combineReducers } from 'redux'
-import reducer from './reducer'
+import adsReducer from './adsReducer'
+import accountReducer from './accountReducer'
+import routerReducer from './routerReducer'
 
 export default combineReducers({
-  ads: reducer
+  $$adsState: adsReducer,
+  $$accountState: accountReducer,
+  $$routerState: routerReducer
 })

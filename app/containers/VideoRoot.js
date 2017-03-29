@@ -7,14 +7,15 @@ export default class VideoRoot extends React.Component {
 
   static propTypes = {
     appState: PropTypes.object.isRequired,
-    video: PropTypes.object.isRequired
+    video: PropTypes.object.isRequired,
+    adID: PropTypes.string.isRequired
   }
 
   render() {
-    const { appState, video } = this.props
+    const { appState, video, adID } = this.props
     return (
       <div className='videoRoot'>
-        <Overlay appState={appState} video={video} />
+        <Overlay appState={appState} video={video} adID={adID} />
       </div>
     )
   }

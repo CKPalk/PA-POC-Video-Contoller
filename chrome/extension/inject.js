@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import VideoRoot from '../../app/containers/VideoRoot'
 
+import { getUid } from '../../app/utils/helpers'
 import { getState, onStateChange } from '../../app/utils/localStorage'
 
 
@@ -10,13 +11,9 @@ import { getState, onStateChange } from '../../app/utils/localStorage'
  * @param   {Object}  video  A HTML5 video element
  * @return  {Boolean}        Whether the user is watching an ad
  */
-function videoIsAd(video) {
+async function videoIsAd(video) {
   return !!video
 }
-
-// function compose(...fns) {
-//   return passed => fns.reduce((res, fn) => fn(res), passed)
-// }
 
 
 function findBestContainer(video) {
@@ -43,6 +40,8 @@ function renderOverlayForVideo(video) {
   mount.style.pointerEvents = 'none'
   findBestContainer(video).appendChild(mount)
 
+  const adID = getUid()
+
   const renderOverlayWithCurrentState = () => {
     getState()
       .then(state => {
@@ -50,6 +49,7 @@ function renderOverlayForVideo(video) {
           <VideoRoot
             appState={state}
             video={video}
+            adID={adID}
           />,
           mount
         )

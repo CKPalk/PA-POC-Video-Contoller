@@ -8,4 +8,4 @@ chrome.runtime.onMessage.addListener(({ type, action }) => {
 })
 
 // Custom @@INIT for our message reducer
-reduceStateWithAction({ type: '@@INIT' })
+reduceStateWithAction({ type: '@@INIT/THIS_APP' })
