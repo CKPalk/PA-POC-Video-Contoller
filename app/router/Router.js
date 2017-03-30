@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { trimCharacter } from '../utils/helpers'
 
 @connect(
   state => ({ destination: state.$$routerState.path }),
@@ -13,14 +14,36 @@ export default class Router extends React.Component {
     children: PropTypes.any.isRequired
   }
 
-  childMatchesDestination = child => {
-    const { destination, path } = this.props
+  static childMatchingDestination = destination => child => {
     const { path: childsPath } = child.props
-    return destination.match(new RegExp(`${path}${childsPath}`))
+    const nextDestination = trimCharacter(destination, '/')
+    const nextChildsPath = childsPath.split('/').join('')
+    return nextDestination.match(new RegExp(`^${nextChildsPath}`))
+  }
+
+  static nextDestination = (currentPath = '', destination) =>
+    destination.slice(
+      destination.search(new RegExp(currentPath)) + currentPath.length
+    )
+
+  static mapDestinationToChildren = (destination, children) =>
+    React.Children.map(children,
+      child => React.cloneElement(child, { destination })
+    )
+
+  static findChildMatchingDestination = (children, destination) =>
+    children.find(Router.childMatchingDestination(destination))
+
+  static getMatchingChild = (currentPath, destination, children) => {
+    const newDestination = Router.nextDestination(currentPath, destination)
+    const childrenWithProps = Router.mapDestinationToChildren(newDestination, children)
+    if (!childrenWithProps) return null
+    const result = Router.findChildMatchingDestination(childrenWithProps, newDestination)
+    return result
   }
 
   render() {
-    const { children } = this.props
-    return children.find(this.childMatchesDestination)
+    const { path, destination, children } = this.props
+    return Router.getMatchingChild(path, destination, children)
   }
 }

@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react'
 import { Provider } from 'react-redux'
-import App from './app/App'
+import Routes from './routes/Routes'
 import '../global.styl'
 
 const PopupRoot = ({ store }) =>
   <Provider store={store}>
-    <App />
+    <Routes />
   </Provider>
 
 PopupRoot.propTypes = {

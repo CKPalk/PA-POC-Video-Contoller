@@ -34,6 +34,7 @@ chrome.contextMenus.create({
   ]
 })
 
+
 chrome.contextMenus.onClicked.addListener(event => {
   if (event.menuItemId === CONTEXT_MENU_ID) {
     popWindow('open')

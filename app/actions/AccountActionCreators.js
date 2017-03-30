@@ -1,6 +1,6 @@
 import { ACCOUNT as ActionTypes } from '../constants/ActionTypes'
-import routes from '../constants/routes'
 import { push } from './RouterActionCreators'
+import URIS from '../constants/routeUris'
 
 //--- ACCOUNT LOGIN ----------------------------------------------------------//
 const accountLoginBefore = () => ({ type: ActionTypes.LOGIN.BEFORE })
@@ -33,7 +33,7 @@ export function accountLogout() {
     const successful = true
     if (successful) {
       dispatch(accountLogoutSuccess())
-      dispatch(push(routes.LOGIN))
+      dispatch(push(URIS.SIGNIN.LOGIN.path))
     } else {
       dispatch(accountLogoutFailure())
     }

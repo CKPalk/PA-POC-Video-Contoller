@@ -1,8 +1,8 @@
 import { ROUTER as ActionTypes } from '../constants/ActionTypes'
-import ROUTES from '../constants/routes'
+import URIS from '../constants/routeUris'
 
 const initialState = {
-  path: ROUTES.LOGIN
+  path: URIS.SIGNIN.LOGIN.path
 }
 
 const actionsMap = {

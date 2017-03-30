@@ -25,5 +25,5 @@
     "storage",
     "*://*.youtube.com/*"
   ],
-  "content_security_policy": "default-src 'self'; script-src 'self'; style-src * 'unsafe-inline'; img-src 'self' data:;"
+  "content_security_policy": "default-src 'self'; script-src 'self'; font-src font-src https://applesocial.s3.amazonaws.com/assets/styles/fonts/ https://d2x27vbv2ndky4.cloudfront.net/fonts/; style-src * 'unsafe-inline'; img-src 'self' data:;"
 }

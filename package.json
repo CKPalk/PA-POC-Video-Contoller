@@ -80,7 +80,9 @@
     "react-css-transition-replace": "^2.2.0",
     "react-dock": "^0.2.3",
     "react-dom": "^15.0.2",
+    "react-packery-component": "^1.0.2",
     "react-redux": "^4.3.0",
+    "react-router-page-transition": "^3.0.2",
     "redux": "^3.2.1",
     "redux-thunk": "^2.0.1"
   }
