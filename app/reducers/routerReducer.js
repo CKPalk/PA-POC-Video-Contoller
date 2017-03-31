@@ -1,13 +1,14 @@
-import { ROUTER as ActionTypes } from '../constants/ActionTypes'
+import Immutable from 'immutable'
+import actionTypes from '../actionTypes/routerActionTypes'
 import URIS from '../constants/routeUris'
 
-const initialState = {
+const initialState = Immutable.fromJS({
   path: URIS.SIGNIN.LOGIN.path
-}
+})
 
 const actionsMap = {
-  [ActionTypes.PUSH](state, { path }) {
-    return { ...state, path }
+  [actionTypes.PUSH](state, { path }) {
+    return state.set('path', path)
   }
 }
 

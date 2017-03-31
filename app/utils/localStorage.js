@@ -1,33 +1,34 @@
+import Immutable from 'immutable'
 import rootReducer from '../reducers'
 import setBadge from './setBadge'
 
-export function getState() {
-  return new Promise(resolve => {
+export const getState = () =>
+  new Promise(resolve => {
     chrome.storage.local.get('state', ({ state = '{}' }) => {
-      resolve(JSON.parse(state))
+      const cleanedState = Object.keys(state)
+        .reduce((res = {}, key) => ({ ...res, [key]: Immutable.fromJS(state[key]) }))
+      resolve(cleanedState)
     })
   })
-}
 
-export function saveState(state) {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.set({ state: JSON.stringify(state) }, () => {
+export const saveState = state =>
+  new Promise((resolve, reject) => {
+    const cleanedState = Object.keys(state)
+      .reduce((res = {}, key) =>
+        ({ ...res, [key]: Immutable.isImmutable(state[key]) ? state[key].toJS() : state[key] })
+      )
+    chrome.storage.local.set({ state: cleanedState }, () => {
       const { runtime: { lastError } } = chrome
       if (lastError) reject(lastError)
       else resolve(state)
     })
   })
-}
 
-const onStateChange = fn =>
+export const onStateChange = fn =>
   chrome.storage.onChanged.addListener(fn)
 
-
-export function reduceStateWithAction(action) {
-  return getState()
+export const reduceStateWithAction = action =>
+  getState()
     .then(state => rootReducer(state, action))
     .then(saveState)
     .then(setBadge)
-}
-
-export { onStateChange }

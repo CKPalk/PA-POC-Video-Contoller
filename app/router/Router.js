@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { trimCharacter } from '../utils/helpers'
 
 @connect(
-  state => ({ destination: state.$$routerState.path }),
+  state => ({ destination: state.$$routerState.get('path') }),
   () => ({})
 )
 export default class Router extends React.Component {

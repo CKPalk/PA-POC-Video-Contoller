@@ -13,3 +13,11 @@ export function trimCharacter(string = '', character = '') {
   }
   return string
 }
+
+export function classNameWithModifiers(className = '', modifiers = {}) {
+  const classes = [className]
+  Object.keys(modifiers).forEach(mod => {
+    if (modifiers[mod]) classes.push(`${className}${mod}`)
+  })
+  return classes.join(' ')
+}

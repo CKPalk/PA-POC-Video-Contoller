@@ -1,4 +1,4 @@
-import { ROUTER as ActionTypes } from '../constants/ActionTypes'
+import actionTypes from '../actionTypes/routerActionTypes'
 
-export const push = path => // eslint-disable-line
-  ({ type: ActionTypes.PUSH, path })
+export const push = path => // eslint-disable-line import/prefer-default-export
+  ({ type: actionTypes.PUSH, path })

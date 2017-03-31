@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as AdActionCreators from '../actions/AdActionCreators'
+import * as AdsActionCreators from '../actions/adsActionCreators'
 import AdCategory from './adCategory/AdCategory'
 import {
   default as AdRatings,
@@ -12,7 +12,7 @@ import {
 
 @connect(
   state => ({ ads: state.$$adsState }),
-  dispatch => ({ actions: bindActionCreators(AdActionCreators, dispatch) })
+  dispatch => ({ actions: bindActionCreators(AdsActionCreators, dispatch) })
 )
 export default class MainSection extends React.Component {
 

@@ -4,24 +4,23 @@
   color: $color-hematite-dark
   width: 100%
   position: relative
-  &__form
-    // Required to override default form
-    position: initial
-    transform: none
-    margin 0 auto
-    // end required
-    &__controls
-      margin-left: .5em
-      opacity: 0.2
-      position: relative
-      &--active
-        opacity: 1
-      &__underline
-        position: absolute
-        height 4px
-        background-color: $color-sea-foam-dark
+  &__controls
+    margin-left: .5em
+    opacity: 0.2
+    position: relative
+    cursor: pointer
+    &--active
+      opacity: 1
+    &__underline
+      position: absolute
+      height 4px
+      background-color: $color-sea-foam-dark
+      transition-property: left, width
+      transition-duration: 200ms
+      transition-timing-function: ease-in-out
+      &.register
+        left: 74px
+        width: 105px
+      &.login
+        left: 180px
         width: 100px
-        &.register
-          left: 64px
-        &.login
-          left: 170px

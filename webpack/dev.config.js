@@ -20,6 +20,15 @@ const baseDevConfig = () => ({
     },
     noInfo: true
   },
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8085',
+        secure: false,
+        changeOrigin: true
+      }
+    }
+  },
   hotMiddleware: {
     path: '/js/__webpack_hmr'
   },

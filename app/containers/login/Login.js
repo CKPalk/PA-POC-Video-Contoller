@@ -1,18 +1,16 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
-import classname from 'classnames'
-import * as AccountActionCreators from '../../actions/AccountActionCreators'
-import * as RouterActionCreators from '../../actions/RouterActionCreators'
-import URIS from '../../constants/routeUris'
+import * as UserActionCreators from '../../actions/userActionCreators'
+import * as RouterActionCreators from '../../actions/routerActionCreators'
+import { classNameWithModifiers as cn } from '../../utils/helpers'
+import FormError from '../../components/formError/FormError'
 import './login.styl'
-import './loginTransition.styl'
 
 @connect(
   state => state,
   dispatch => ({ actions: bindActionCreators({
-    ...AccountActionCreators,
+    ...UserActionCreators,
     ...RouterActionCreators
   }, dispatch) })
 )
@@ -25,69 +23,70 @@ export default class Login extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      isRegister: true
+      returningUser: false,
+      form: {}
     }
-  }
-
-  login = () => {
-    const { actions } = this.props
-    actions.accountLogin()
-    actions.push(URIS.HISTORY.path)
   }
 
   submitLoginForm = e => {
     e.preventDefault()
-    const { actions: { push } } = this.props
-    const { isRegister } = this.state
-    push(isRegister ? URIS.SIGNIN.PROFILE_BUILDER.path : URIS.HISTORY.path)
+    const { actions: { postSignup } } = this.props
+    const { form } = this.state
+    postSignup(form)
+  }
+
+  recordForm = e => {
+    this.setState({
+      form: { ...this.state.form,
+        [e.target.name]: e.target.value
+      }
+    })
   }
 
   showRegister = () => {
-    if (!this.state.isRegister) {
-      this.setState({ isRegister: true })
-    }
+    if (this.state.returningUser)
+      this.setState({ returningUser: false })
   }
 
   showLogin = () => {
-    if (this.state.isRegister) {
-      this.setState({ isRegister: false })
-    }
+    if (!this.state.returningUser)
+      this.setState({ returningUser: true })
   }
 
   render() {
-    const { isRegister } = this.state
+    const { returningUser } = this.state
+
+    const signUpClassName = cn('login__controls', { '--active': !returningUser })
+    const signInClassName = cn('login__controls', { '--active': returningUser })
+    const underlineClassName = `login__controls__underline ${returningUser ? 'login' : 'register'}`
+    const firstNameClassName = cn('form-input', { '-inactive': returningUser })
 
     return (
-      <div key='login' className='login'>
-        <form onSubmit={this.submitLoginForm} className='login__form'>
+      <div className='login'>
+        <form autoComplete='off' onSubmit={this.submitLoginForm} className='login__form'>
           <fieldset>
             <legend>
               <span className='number'>1</span>
-              <a
-                onClick={this.showRegister}
-                className={classname('login__form__controls', { 'login__form__controls--active': isRegister })}
-              >
-                Sign Up
-              </a>
-              <a
-                onClick={this.showLogin}
-                className={classname('login__form__controls', { 'login__form__controls--active': !isRegister })}
-              >
-                Sign In
-              </a>
-              <div className={classname('login__form__controls__underline', isRegister ? 'register' : 'login')} />
+              <a onClick={this.showRegister} className={signUpClassName}>Sign Up</a>
+              <a onClick={this.showLogin} className={signInClassName}>Sign In</a>
+              <div className={underlineClassName} />
             </legend>
-            <ReactCSSTransitionGroup
-              transitionName='login-form-transition'
-              transitionEnter
-              transitionLeave
-              transitionEnterTimeout={400}
-              transitionLeaveTimeout={400}
-            >
-              { isRegister && <input key='firstName' type='text' name='firstName' placeholder='First Name' /> }
-              <input key='phoneNumber' type='tel' name='phoneNumber' placeholder='Phone Number' />
-              <input key='submit' type='submit' value={isRegister ? 'Submit' : 'Login'} />
-            </ReactCSSTransitionGroup>
+            <FormError />
+            <input
+              name='firstName'
+              type='text'
+              className={firstNameClassName}
+              onChange={this.recordForm}
+              placeholder='First Name'
+            />
+            <input
+              name='phoneNumber'
+              type='tel'
+              className='form-input'
+              onChange={this.recordForm}
+              placeholder='Phone Number'
+            />
+            <input type='submit' value={returningUser ? 'Login' : 'Submit'} />
           </fieldset>
         </form>
       </div>

@@ -16,9 +16,8 @@ export default function msgConnect(mapStateToProps, mapDispatchToProps) {
 
       constructor(props) {
         super(props)
-        if (!props.appState) {
+        if (!props.appState)
           throw new Error('Component must have appState passed as prop')
-        }
       }
 
       render() {

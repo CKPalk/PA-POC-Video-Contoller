@@ -24,7 +24,9 @@
     "management",
     "tabs",
     "storage",
-    "*://*.youtube.com/*"
+    "*://*.youtube.com/*",
+    "http://*/",
+    "https://*/"
   ],
-  "content_security_policy": "default-src 'self'; script-src 'self' http://localhost:3000 https://localhost:3000 'unsafe-eval'; font-src 'self' data: https://applesocial.s3.amazonaws.com/ https://d2x27vbv2ndky4.cloudfront.net/; connect-src http://localhost:3000 https://localhost:3000; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_security_policy": "default-src 'self'; script-src 'self' http://localhost:3000 https://localhost:3000 'unsafe-eval'; font-src 'self' data: https://applesocial.s3.amazonaws.com/ https://d2x27vbv2ndky4.cloudfront.net/; connect-src http://localhost:3000 https://localhost:3000 http://localhost:8085 https://localhost:8085; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

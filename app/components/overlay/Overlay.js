@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import { bindActionCreators } from 'redux'
-import * as AdActionCreators from '../../actions/AdActionCreators'
+import * as AdsActionCreators from '../../actions/adsActionCreators'
 import VideoForm from '../../components/videoForm/VideoForm'
 import msgConnect from '../../utils/msgConnect'
 import style from './overlay.styl'
@@ -8,7 +8,7 @@ import style from './overlay.styl'
 
 @msgConnect(
   () => ({}),
-  dispatch => ({ actions: bindActionCreators(AdActionCreators, dispatch) })
+  dispatch => ({ actions: bindActionCreators(AdsActionCreators, dispatch) })
 )
 export default class Overlay extends Component { // eslint-disable-line
 

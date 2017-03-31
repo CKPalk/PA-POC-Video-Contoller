@@ -4,6 +4,16 @@ a
   &:active
   &:hover
     color #555
+.form-input
+  opacity 1
+  transition all 0.4s
+  &-inactive
+    opacity 0
+    display: block
+    margin-bottom 0 !important
+    height 0 !important
+    padding 0 !important
+
 form
   font-size 1.2em
   max-width 500px
@@ -12,7 +22,6 @@ form
   background #f4f7f8
   margin 10px auto
   padding 20px
-  background #f4f7f8
   border-radius 8px
   position absolute
   font-family Georgia, "Times New Roman", Times, serif
@@ -25,10 +34,15 @@ form
     font-size 1.4em
     margin-bottom 30px
     width 100%
+    user-select none
+    cursor default
   label
     display block
     margin-bottom 8px
-
+  .more
+    &:hover
+      text-decoration underline
+      cursor pointer
 input[type=text]
 input[type=date]
 input[type=datetime]
@@ -51,8 +65,9 @@ select
   width 100%
   box-sizing border-box
   background-color #e8eeef
-  color #8a97a0
-  box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+  color #555
+  box-shadow 0 1px 0 rgba(0,0,0,0.03) inset
+  font-family Georgia, "Times New Roman", Times, serif
   margin-bottom 30px
   &:focus
     background #d2d9dd
@@ -67,7 +82,7 @@ select
   width 30px
   display inline-block
   font-size 0.8em
-  margin-right 4px
+  margin-right 14px
   line-height 30px
   text-align center
   text-shadow 0 1px 0 rgba(255,255,255,0.2)
@@ -78,6 +93,7 @@ input[type="button"]
   position relative
   display block
   padding 19px 39px 18px 39px
+  font-family Georgia, "Times New Roman", Times, serif
   color #FFF
   margin 0 auto
   border-radius 4px
@@ -90,13 +106,19 @@ input[type="button"]
   border-width 1px 1px 3px
   margin-bottom 10px
   &:hover
-    background: #109177
-  &.skip
-    display: inline-block
-    width: 20%
-    margin: 0
-    padding: 2px 6px 3px
-    transform: none
-    line-height: 1em
-    font-size: 0.8em
-    float: right
+    background #109177
+ .form-error
+    padding 10px 7px
+    color #999
+    font-size 0.8em
+    transition 0.28s
+    overflow hidden
+    color #a02a16
+    font-style italic
+    span
+      padding 0 10px
+      a
+
+        color inherit
+        text-decoration underline
+        cursor pointer

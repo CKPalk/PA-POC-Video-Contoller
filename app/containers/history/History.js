@@ -3,15 +3,13 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Header from '../../components/Header'
 import MainSection from '../../components/MainSection'
-import * as AdActionCreators from '../../actions/AdActionCreators'
-import * as AccountActionCreators from '../../actions/AccountActionCreators'
+import * as UserActionCreators from '../../actions/userActionCreators'
 import style from './History.css'
 
 @connect(
   state => ({ ads: state.$$adsState }),
   dispatch => ({ actions: bindActionCreators({
-    ...AdActionCreators,
-    ...AccountActionCreators
+    ...UserActionCreators
   }, dispatch) })
 )
 export default class History extends Component {
@@ -22,7 +20,7 @@ export default class History extends Component {
 
   logout = () => {
     const { actions } = this.props
-    actions.accountLogout()
+    actions.logout()
   }
 
   render() {

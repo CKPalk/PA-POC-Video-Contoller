@@ -23,7 +23,8 @@
     "arrow-parens": ["error", "as-needed"],
     "no-param-reassign": ["error", { "props": false }],
     "jsx-quotes": ["error", "prefer-single"],
-    "new-cap": 0
+    "new-cap": 0,
+    "curly": ["error", "multi", "consistent"]
   },
   "plugins": [
     "react"
