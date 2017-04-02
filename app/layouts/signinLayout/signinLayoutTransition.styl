@@ -1,0 +1,44 @@
+// .signin-layout-transition
+//   &-enter
+//     opacity: 0.01
+//     &.signin-layout-transition-enter-active
+//       opacity: 1
+//       transition: opacity 500ms ease-in
+//
+// .signin-layout-transition
+//   &-leave
+//     opacity: 1
+//     &.signin-layout-transition-leave-active
+//       opacity: 0.01
+//       transition: opacity 500ms ease-in
+//
+// .signin-layout-transition
+//   &-appear
+//     opacity: 0.01
+//     &.signin-layout-transition-appear-active
+//       opacity: 1
+//       transition: opacity 500ms ease-in
+
+$transition-duration = .8s
+$transition-timing-function = ease-in-out
+
+.signin-layout-transition
+  &-enter
+    transform: translate3d(100%,0,0)
+    z-index: 10000
+    &.signin-layout-transition-enter-active
+      transition-duration: $transition-duration
+      transition-property: transform, opacity
+      transition-timing-function: $transition-timing-function
+      transform: translate3d(0,0,0)
+
+.signin-layout-transition
+  &-leave
+    transition-duration: $transition-duration
+    transition-property: transform, opacity
+    transition-timing-function: $transition-timing-function
+    transform: translate3d(0,0,0)
+    opacity: 1
+    &.signin-layout-transition-leave-active
+      transform: translate3d(-100%,0,0)
+      opacity: 0.3

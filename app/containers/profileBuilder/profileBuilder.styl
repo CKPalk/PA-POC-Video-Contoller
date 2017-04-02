@@ -1,0 +1,19 @@
+@import '../../global.styl'
+
+.profileBuilder
+  height auto
+  &__avatars
+    margin-bottom: 20px
+    .avatar
+      background-color: $color-bright-blue
+      display: inline-block
+      height: 80px
+      width: @height
+      border-radius: 5px
+      transition: transform .1s ease-out
+      &:hover
+        transform: scale(1.1)
+      &--active
+        transform: scale(1.1)
+        background-color: $color-green
+        z-index: 100

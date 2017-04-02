@@ -1,0 +1,20 @@
+.app-layout-transition
+  &-enter
+    opacity: 0.01
+    &.app-layout-transition-enter-active
+      opacity: 1
+      transition: opacity 500ms ease-in
+
+.app-layout-transition
+  &-leave
+    opacity: 1
+    &.app-layout-transition-leave-active
+      opacity: 0.01
+      transition: opacity 500ms ease-in
+
+.app-layout-transition
+  &-appear
+    opacity: 0.01
+    &.app-layout-transition-appear-active
+      opacity: 1
+      transition: opacity 500ms ease-in
